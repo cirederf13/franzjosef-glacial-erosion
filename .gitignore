@@ -1,0 +1,6 @@
+outputs/
+__pycache__/
+*.nc
+*.mp4
+*.log
+.DS_Store

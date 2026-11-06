@@ -1,0 +1,20 @@
+name: igm-erosion
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy=1.26
+  - scipy=1.17
+  - pandas
+  - xarray
+  - matplotlib=3.11
+  - rasterio
+  - pyproj
+  - scikit-image
+  - pymupdf
+  - ffmpeg      # only for the animation (animate_ice_history.py)
+  - rsync
+  - pip
+  - pip:
+      # IGM itself is NOT vendored here. Pinned to the release + commit used:
+      - git+https://github.com/instructed-glacier-model/igm.git@c5b3434045f625145f41bc49de36e08a4706f42a

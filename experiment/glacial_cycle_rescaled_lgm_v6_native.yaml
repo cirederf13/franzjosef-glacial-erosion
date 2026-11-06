@@ -1,0 +1,61 @@
+# @package _global_
+# Full ~100 ka glacial cycle (t = -100030.8 .. -70 yr) at native 78 m: the run used in the paper.
+# Forcing: glacial_cycle_smb_rescaled_lgm_v5.txt. Basal friction: tau_ref = 0.13 MPa, calibrated on the 2013 velocities (run_tau_ref_sweep.sh).
+# Timestep: cfl 0.2 with cfl_percentile 100, so the fastest cell controls the step.
+# The saved output starts at t = -98030.8: the run was resumed from that snapshot of an identical earlier run (make_restart.py).
+
+defaults:
+  - override /inputs:
+    - load_tif
+  - override /processes:
+    - smb
+    - iceflow
+    - time
+    - thk
+  - override /outputs:
+    - write_ncdf
+    - plot2d
+
+inputs:
+  load_tif:
+    coarsen: 1
+
+processes:
+  smb:
+    method: simple
+    simple:
+      file: ../glacial_cycle_smb_rescaled_lgm_v5.txt
+  iceflow:
+    physics:
+      viscosity:
+        arrhenius: 60.0
+      sliding:
+        law: weertman
+        exponent: 2.0
+        tau_ref: 0.13
+  time:
+    start: -100030.80
+    end: -70.0
+    save: 1000.0
+
+    cfl: 0.2
+    cfl_percentile: 100.0
+    step_max: 0.25
+
+outputs:
+  write_ncdf:
+    output_file: output.nc
+    vars_to_save:
+      - topg
+      - usurf
+      - thk
+      - smb
+      - velsurf_mag
+      - uvelsurf
+      - vvelsurf
+      - velbase_mag
+      - uvelbase
+      - vvelbase
+  plot2d:
+    var: thk
+    var_max: 2000.0

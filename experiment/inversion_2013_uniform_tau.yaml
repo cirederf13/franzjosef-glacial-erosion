@@ -1,0 +1,49 @@
+# @package _global_
+# 2013 velocity inversion: ice thickness only, with a uniform prescribed Weertman tau_ref.
+# tau_ref below is IGM's default; run_tau_ref_sweep.sh overrides it (adopted value 0.13 MPa).
+# Inputs in data_inversion/; the thickness regularisation weight lam is varied by run_lambda_h_sweep.sh.
+
+defaults:
+  - override /inputs:
+    - load_tif
+  - override /processes:
+    - iceflow
+  - override /assimilations:
+    - field_inversion
+
+core:
+  check_compat_params: false
+  folder_data: data_inversion
+
+inputs:
+  load_tif:
+    coarsen: 1
+
+processes:
+  iceflow:
+    method: unified
+    physics:
+      viscosity:
+        arrhenius: 60.0
+      sliding:
+        law: weertman
+        exponent: 2.0
+        u_ref: 100.0
+        tau_ref: 0.2153697218796329
+
+assimilations:
+  field_inversion:
+    optimization:
+      nbitmax: 6000
+      minimizer_patience: 15
+      retrain_iter: 0
+    output:
+      freq: 50
+      vars_to_save: [usurf, thk, icemask, velbase_mag, velsurf_mag, velsurfobs_mag, tau_ref, sliding_ratio]
+    variables:
+      - { name: thk, transform: identity, lower_bound: 0.0, upper_bound: 1000.0, mask: icemask }
+    objective:
+      misfit:
+        - { name: velsurf, kind: gaussian, components: [uvelsurf, vvelsurf], obs: [uvelsurfobs, vvelsurfobs], std: 50.0 }
+      regularization:
+        - { name: thk, penalty: squared_laplacian, lam: 1000000.0 }
